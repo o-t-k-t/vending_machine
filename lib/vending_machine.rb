@@ -1,21 +1,23 @@
 # frozen_string_literal: true
 
-require 'item.rb'
 require 'currency.rb'
-
-require 'pry'
 
 # VendingMachine dispenses beverages
 class VendingMachine
-  ITEMS = [Item.new('cola'), Item.new('oolong_tea'), Item.new('water')].freeze
+  PRICES = {
+    cola:  100,
+    oolong_tea: 100,
+    water: 100,
+    redbull: 200
+  }.freeze
 
   def initialize
-    @payment = 0
+    @payment = Money.new(0)
   end
 
   def insert(curr)
-    if curr.price == 100
-      @payment += curr.price
+    if curr == Currency.new(100)
+      @payment += curr
       false
     else
       curr
@@ -23,19 +25,13 @@ class VendingMachine
   end
 
   def push_bottun(name)
-    item = Item.new(name)
-    raise 'Absent item' unless ITEMS.include?(item)
+    price = PRICES[name]
+    raise 'Absent item' if price.nil?
 
-    if @payment >= 100
-      item
+    if Money.new(price) <= @payment
+      name
     else
       false
     end
-  end
-
-  private
-
-  def currency(price)
-    Currency.new(price)
   end
 end
