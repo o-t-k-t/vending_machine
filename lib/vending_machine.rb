@@ -7,6 +7,8 @@ require 'pry'
 
 # VendingMachine dispenses beverages
 class VendingMachine
+  ITEMS = [Item.new('cola'), Item.new('oolong_tea'), Item.new('water')].freeze
+
   def initialize
     @payment = 0
   end
@@ -20,9 +22,12 @@ class VendingMachine
     end
   end
 
-  def push_bottun
+  def push_bottun(name)
+    item = Item.new(name)
+    raise 'Absent item' unless ITEMS.include?(item)
+
     if @payment >= 100
-      Item.new('cola')
+      item
     else
       false
     end

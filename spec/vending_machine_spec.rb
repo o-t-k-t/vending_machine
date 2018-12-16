@@ -43,7 +43,22 @@ describe VendingMachine do
     with_them do
       it 'dispenses a cola if payment is enough' do
         number_of_insertion.times { vm.insert(Currency.new(100)) }
-        expect(vm.push_bottun).to eq dispensed
+        expect(vm.push_bottun('cola')).to eq dispensed
+      end
+    end
+  end
+
+  context 'when the push some bottuns' do
+    where(:name, :dispensed) do
+      'cola'       | Item.new('cola')
+      'oolong_tea' | Item.new('oolong_tea')
+      'water'      | Item.new('water')
+    end
+
+    with_them do
+      it 'dispenses supported item' do
+        vm.insert(Currency.new(100))
+        expect(vm.push_bottun(name)).to eq dispensed
       end
     end
   end
