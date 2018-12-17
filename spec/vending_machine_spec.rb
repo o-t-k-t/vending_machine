@@ -109,4 +109,14 @@ describe VendingMachine do
       expect(vm.push(:oolong_tea)).to eq [:oolong_tea, Money.new(0)]
     end
   end
+
+  context 'when currencies has inserted' do
+    before do
+      vm.insert(Currency.new(100))
+    end
+
+    it 'refund payments if requested' do
+      expect(vm.refund).to eq Money.new(100)
+    end
+  end
 end

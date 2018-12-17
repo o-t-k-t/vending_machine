@@ -10,7 +10,7 @@ require_relative 'button.rb'
 class VendingMachine
   extend Forwardable
 
-  delegate %i[insert] => :@vending_machine
+  delegate %i[insert refund] => :@vending_machine
   delegate %i[show push] => :@bottun_list
 
   def initialize
@@ -74,6 +74,12 @@ class VendingMachineCore
     changed
     notify_observers(@payment)
 
+    rtn
+  end
+
+  def refund
+    rtn = @payment.clone
+    @payment = Money.new(0)
     rtn
   end
 end
