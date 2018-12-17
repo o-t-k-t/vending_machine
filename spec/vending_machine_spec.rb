@@ -119,4 +119,34 @@ describe VendingMachine do
       expect(vm.refund).to eq Money.new(100)
     end
   end
+
+  describe '#touch' do
+    context 'when no item selected' do
+      it 'dispalays balance' do
+        fc_mock = double('Feica Client')
+        allow(fc_mock).to receive(:balance).and_return(1000)
+        expect(fc_mock).to receive(:balance)
+
+        allow(FelicaClient).to receive(:new).and_return(fc_mock)
+        vm = VendingMachine.new
+
+        expect(vm.touch).to eq 'Your balance: 1000 yen'
+      end
+    end
+
+    context 'when a item selected' do
+      it 'withdraw and dispenses a item' do
+        fc_mock = double('Feica Client')
+        allow(fc_mock).to receive(:withdraw).and_return(true)
+        expect(fc_mock).to receive(:withdraw)
+
+        allow(FelicaClient).to receive(:new).and_return(fc_mock)
+        vm = VendingMachine.new
+
+        vm.push(:cola)
+
+        expect(vm.touch).to eq :cola
+      end
+    end
+  end
 end

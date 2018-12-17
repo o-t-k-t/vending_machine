@@ -5,23 +5,33 @@ require 'forwardable'
 
 require_relative 'currency.rb'
 require_relative 'button.rb'
+require_relative 'felica.rb'
 
 # VendingMachine is a facade of this program
 class VendingMachine
   extend Forwardable
 
-  delegate %i[insert refund] => :@vending_machine
+  delegate %i[insert refund touch] => :@vending_machine
   delegate %i[show push] => :@bottun_list
 
   def initialize
-    @vending_machine = VendingMachineCore.new
+    @vending_machine = VendingMachineCore.new(felica_client)
     @bottun_list = @vending_machine.bottun_list
+  end
+
+  private
+
+  def felica_client
+    FelicaClient.new
   end
 end
 
 # VendingMachineCore dispenses beverages
 class VendingMachineCore
   include Observable
+  extend Forwardable
+
+  delegate %i[touch] => :@felica_state
 
   attr_reader :payment
 
@@ -34,21 +44,24 @@ class VendingMachineCore
 
   COINS = [10, 50, 100, 500].freeze
 
-  def initialize
+  def initialize(felica_client)
     @payment = Money.new(0)
+    @felica_client = felica_client
+    @felica_state = FelicaUnselectedState.new(@felica_client)
   end
 
   def insert(curr)
-    return curr unless COINS.map { |ac| Currency.new(ac) }.include?(curr)
+    return curr unless COINS.find { |c| Currency.new(c) == curr }
 
     @payment += curr
     changed
     notify_observers(@payment)
+
     false
   end
 
   def bottun_list
-    bl = ButtonList.new
+    bl = BottunList.new
 
     PRICES.map do |k, v|
       bottun = Button.new(k, Money.new(v), self)
@@ -63,7 +76,13 @@ class VendingMachineCore
     raise 'Absent item' if PRICES[name].nil?
 
     price = Money.new(PRICES[name])
-    return [] if price > @payment
+
+    # 支払金が足りなければ商品はださずにFelica受付
+    if price > @payment
+      puts "#{price} #{@payment}"
+      @felica_state = FelicaSelectedState.new(@felica_client, name, price)
+      return []
+    end
 
     # 商品代金をひいた支払金をお釣りとして返却
     @payment -= price

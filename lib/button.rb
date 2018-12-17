@@ -38,7 +38,7 @@ class Button
 end
 
 # ButtnList is contains buttons, just a thin wrapper
-class ButtonList
+class BottunList
   def initialize
     @bottuns = []
   end
