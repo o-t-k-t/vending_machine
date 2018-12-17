@@ -14,7 +14,7 @@ class Button
   end
 
   def push
-    @vending_machine.push_bottun(@name)
+    @vending_machine.buy(@name)
   end
 
   def update(payment)
@@ -23,6 +23,8 @@ class Button
     if payment >= @price
       @blink = true
       puts "💥 #{@name} is available" unless blink_last
+    else
+      @blink = false
     end
   end
 

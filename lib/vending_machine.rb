@@ -59,14 +59,21 @@ class VendingMachineCore
     bl
   end
 
-  def push_bottun(name)
-    price = PRICES[name]
-    raise 'Absent item' if price.nil?
+  def buy(name)
+    raise 'Absent item' if PRICES[name].nil?
 
-    if Money.new(price) <= @payment
-      name
-    else
-      false
-    end
+    price = Money.new(PRICES[name])
+    return [] if price > @payment
+
+    # 商品代金をひいた支払金をお釣りとして返却
+    @payment -= price
+
+    rtn = [name, @payment.clone]
+    @payment = Money.new(0)
+
+    changed
+    notify_observers(@payment)
+
+    rtn
   end
 end

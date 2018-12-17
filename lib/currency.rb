@@ -8,6 +8,7 @@ class Money
 
   def initialize(price)
     @price = price
+    freeze
   end
 
   def <=>(other)
@@ -20,6 +21,10 @@ class Money
 
   def +(other)
     self.class.new(@price + other.price)
+  end
+
+  def -(other)
+    self.class.new(@price - other.price)
   end
 
   def to_s

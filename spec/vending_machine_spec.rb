@@ -35,9 +35,9 @@ describe VendingMachine do
 
   context 'when the push a cola bottun after some-times-currencies insertion' do
     where(:number_of_insertion, :dispensed) do
-      0 | false
-      1 | :cola
-      2 | :cola
+      0 | []
+      1 | [:cola, Money.new(0)]
+      2 | [:cola, Money.new(100)]
     end
 
     with_them do
@@ -50,24 +50,24 @@ describe VendingMachine do
 
   context 'when the push a redbull bottun after some-times-currencies insertion' do
     where(:number_of_insertion, :dispensed) do
-      1 | :cola
-      2 | :cola
-      3 | :cola
+      1 | []
+      2 | [:redbull, Money.new(0)]
+      3 | [:redbull, Money.new(100)]
     end
 
     with_them do
       it 'dispenses a cola if payment is enough' do
         number_of_insertion.times { vm.insert(Currency.new(100)) }
-        expect(vm.push(:cola)).to eq dispensed
+        expect(vm.push(:redbull)).to eq dispensed
       end
     end
   end
 
   context 'when the push some bottuns' do
     where(:name, :dispensed) do
-      :cola       | :cola
-      :oolong_tea | :oolong_tea
-      :water      | :water
+      :cola       | [:cola, Money.new(0)]
+      :oolong_tea | [:oolong_tea, Money.new(0)]
+      :water      | [:water, Money.new(0)]
     end
 
     with_them do
@@ -91,6 +91,22 @@ describe VendingMachine do
         number_of_insertion.times { vm.insert(Currency.new(100)) }
         expect(vm.show).to eq display
       end
+    end
+  end
+
+  context 'when cola has bought with 100 yen' do
+    before do
+      vm.insert(Currency.new(100))
+      vm.push(:cola)
+    end
+
+    it 'cannot sell more item without additional payment' do
+      expect(vm.push(:oolong_tea)).to eq []
+    end
+
+    it 'can sell more item with additional payment' do
+      vm.insert(Currency.new(100))
+      expect(vm.push(:oolong_tea)).to eq [:oolong_tea, Money.new(0)]
     end
   end
 end
