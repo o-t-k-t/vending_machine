@@ -1,9 +1,30 @@
 # frozen_string_literal: true
 
-require 'currency.rb'
+require 'observer'
+require 'forwardable'
 
-# VendingMachine dispenses beverages
+require_relative 'currency.rb'
+require_relative 'button.rb'
+
+# VendingMachine is a facade of this program
 class VendingMachine
+  extend Forwardable
+
+  delegate %i[insert] => :@vending_machine
+  delegate %i[show push] => :@bottun_list
+
+  def initialize
+    @vending_machine = VendingMachineCore.new
+    @bottun_list = @vending_machine.bottun_list
+  end
+end
+
+# VendingMachineCore dispenses beverages
+class VendingMachineCore
+  include Observable
+
+  attr_reader :payment
+
   PRICES = {
     cola:  100,
     oolong_tea: 100,
@@ -18,10 +39,24 @@ class VendingMachine
   def insert(curr)
     if curr == Currency.new(100)
       @payment += curr
+      changed
+      notify_observers(@payment)
       false
     else
       curr
     end
+  end
+
+  def bottun_list
+    bl = ButtonList.new
+
+    PRICES.map do |k, v|
+      bottun = Button.new(k, Money.new(v), self)
+      bl.append(bottun)
+      bottun
+    end
+
+    bl
   end
 
   def push_bottun(name)

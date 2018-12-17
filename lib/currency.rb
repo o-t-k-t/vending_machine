@@ -21,6 +21,10 @@ class Money
   def +(other)
     self.class.new(@price + other.price)
   end
+
+  def to_s
+    "#{price} yen"
+  end
 end
 
 # Currency represents coins and bills, so has only specific value

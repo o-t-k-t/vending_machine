@@ -43,7 +43,7 @@ describe VendingMachine do
     with_them do
       it 'dispenses a cola if payment is enough' do
         number_of_insertion.times { vm.insert(Currency.new(100)) }
-        expect(vm.push_bottun(:cola)).to eq dispensed
+        expect(vm.push(:cola)).to eq dispensed
       end
     end
   end
@@ -58,7 +58,7 @@ describe VendingMachine do
     with_them do
       it 'dispenses a cola if payment is enough' do
         number_of_insertion.times { vm.insert(Currency.new(100)) }
-        expect(vm.push_bottun(:cola)).to eq dispensed
+        expect(vm.push(:cola)).to eq dispensed
       end
     end
   end
@@ -73,7 +73,23 @@ describe VendingMachine do
     with_them do
       it 'dispenses supported item' do
         vm.insert(Currency.new(100))
-        expect(vm.push_bottun(name)).to eq dispensed
+        expect(vm.push(name)).to eq dispensed
+      end
+    end
+  end
+
+  context 'when viewing bottuns after some-times-currencies insertion' do
+    where(:number_of_insertion, :display) do
+      0 | '⚫️ cola: 100 yen, ⚫️ oolong_tea: 100 yen, ⚫️ water: 100 yen, ⚫️ redbull: 200 yen'
+      1 | '🔵 cola: 100 yen, 🔵 oolong_tea: 100 yen, 🔵 water: 100 yen, ⚫️ redbull: 200 yen'
+      2 | '🔵 cola: 100 yen, 🔵 oolong_tea: 100 yen, 🔵 water: 100 yen, 🔵 redbull: 200 yen'
+      3 | '🔵 cola: 100 yen, 🔵 oolong_tea: 100 yen, 🔵 water: 100 yen, 🔵 redbull: 200 yen'
+    end
+
+    with_them do
+      it 'dispenses a cola if payment is enough' do
+        number_of_insertion.times { vm.insert(Currency.new(100)) }
+        expect(vm.show).to eq display
       end
     end
   end
