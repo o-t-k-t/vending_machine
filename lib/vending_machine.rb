@@ -32,19 +32,19 @@ class VendingMachineCore
     redbull: 200
   }.freeze
 
+  COINS = [10, 50, 100, 500].freeze
+
   def initialize
     @payment = Money.new(0)
   end
 
   def insert(curr)
-    if curr == Currency.new(100)
-      @payment += curr
-      changed
-      notify_observers(@payment)
-      false
-    else
-      curr
-    end
+    return curr unless COINS.map { |ac| Currency.new(ac) }.include?(curr)
+
+    @payment += curr
+    changed
+    notify_observers(@payment)
+    false
   end
 
   def bottun_list

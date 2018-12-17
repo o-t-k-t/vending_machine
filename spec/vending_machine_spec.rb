@@ -15,10 +15,10 @@ describe VendingMachine do
     where(:inserted, :refund?) do
       1      | true
       5      | true
-      10     | true
-      50     | true
+      10     | false
+      50     | false
       100    | false
-      500    | true
+      500    | false
       1000   | true
       5000   | true
       10_000 | true
