@@ -4,8 +4,6 @@
 class Money
   include Comparable
 
-  attr_reader :price
-
   def initialize(price)
     @price = price
     freeze
@@ -30,9 +28,13 @@ class Money
   def to_s
     "#{price} yen"
   end
+
+  protected
+
+  attr_reader :price
 end
 
-# Currency represents coins and bills, so has only specific value
+# Currency represents a coin or a banknote, so has only specific value
 class Currency < Money
   TYPES = [1, 5, 10, 50, 100, 500, 1000, 5000, 10_000].freeze
 

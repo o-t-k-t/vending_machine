@@ -35,13 +35,7 @@ class VendingMachineCore
 
   attr_reader :payment
 
-  PRICES = {
-    cola:  100,
-    oolong_tea: 100,
-    water: 100,
-    redbull: 200
-  }.freeze
-
+  PRICES = { cola: 100, oolong_tea: 100, water: 100, redbull: 200 }.freeze
   COINS = [10, 50, 100, 500].freeze
 
   def initialize(felica_client)
@@ -54,7 +48,7 @@ class VendingMachineCore
     return curr unless COINS.find { |c| Currency.new(c) == curr }
 
     @payment += curr
-    changed and notify_observers(@payment)
+    notify_bottuns
 
     false
   end
@@ -79,19 +73,19 @@ class VendingMachineCore
     end
 
     @payment -= price
-
-    rtn = [name, @payment.clone]
-    @payment = Money.new(0)
-
-    changed and notify_observers(@payment)
-
-    rtn
+    [name, refund]
   end
 
   def refund
-    rtn = @payment.clone
-    @payment = Money.new(0)
+    @payment.tap do
+      @payment = Money.new(0)
+      notify_bottuns
+    end
+  end
+
+  private
+
+  def notify_bottuns
     changed and notify_observers(@payment)
-    rtn
   end
 end
