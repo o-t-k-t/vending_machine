@@ -91,6 +91,7 @@ class VendingMachineCore
   def refund
     rtn = @payment.clone
     @payment = Money.new(0)
+    changed and notify_observers(@payment)
     rtn
   end
 end

@@ -94,6 +94,21 @@ describe VendingMachine do
     end
   end
 
+  context 'when refund or else after coin insertion' do
+    where(:refund?, :display) do
+      false | '🔵 cola: 100 yen, 🔵 oolong_tea: 100 yen, 🔵 water: 100 yen, ⚫️ redbull: 200 yen'
+      true  | '⚫️ cola: 100 yen, ⚫️ oolong_tea: 100 yen, ⚫️ water: 100 yen, ⚫️ redbull: 200 yen'
+    end
+
+    with_them do
+      it 'lights down after refunding' do
+        vm.insert(Currency.new(100))
+        vm.refund if refund?
+        expect(vm.show).to eq display
+      end
+    end
+  end
+
   context 'when cola has bought with 100 yen' do
     before do
       vm.insert(Currency.new(100))
