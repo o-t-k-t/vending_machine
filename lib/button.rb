@@ -41,6 +41,7 @@ end
 class BottunList
   def initialize
     @bottuns = []
+    yield self
   end
 
   def append(bottun)

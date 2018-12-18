@@ -54,22 +54,17 @@ class VendingMachineCore
     return curr unless COINS.find { |c| Currency.new(c) == curr }
 
     @payment += curr
-    changed
-    notify_observers(@payment)
+    changed and notify_observers(@payment)
 
     false
   end
 
   def bottun_list
-    bl = BottunList.new
-
-    PRICES.map do |k, v|
-      bottun = Button.new(k, Money.new(v), self)
-      bl.append(bottun)
-      bottun
+    BottunList.new do |bl|
+      PRICES.each do |k, v|
+        bl.append(Button.new(k, Money.new(v), self))
+      end
     end
-
-    bl
   end
 
   def buy(name)
@@ -77,21 +72,18 @@ class VendingMachineCore
 
     price = Money.new(PRICES[name])
 
-    # 支払金が足りなければ商品はださずにFelica受付
     if price > @payment
       puts "#{price} #{@payment}"
       @felica_state = FelicaSelectedState.new(@felica_client, name, price)
       return []
     end
 
-    # 商品代金をひいた支払金をお釣りとして返却
     @payment -= price
 
     rtn = [name, @payment.clone]
     @payment = Money.new(0)
 
-    changed
-    notify_observers(@payment)
+    changed and notify_observers(@payment)
 
     rtn
   end
