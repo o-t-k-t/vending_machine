@@ -1,16 +1,3 @@
-# FelicaState is prototype of state-dependent behavior
-class FelicaState
-  def touch
-    raise 'No implementation'
-  end
-
-  private
-
-  def felica_client
-    raise 'Felica client assumed be doubled'
-  end
-end
-
 # FelicaUnselectedState behaves as if no item selected
 class FelicaUnselectedState
   def initialize(felica_client)
