@@ -25,7 +25,7 @@ describe VendingMachine do
     end
 
     with_them do
-      it 'rejects currencys other than 100 yen' do
+      it 'rejects currencys other than acceptable' do
         curr = Currency.new(inserted)
         refund = refund? ? curr : false
         expect(vm.insert(Currency.new(inserted))).to eq refund
@@ -48,7 +48,7 @@ describe VendingMachine do
     end
   end
 
-  context 'when the push a redbull bottun after some-times-currencies insertion' do
+  context 'when push a redbull bottun after some-times-currencies insertion' do
     where(:number_of_insertion, :dispensed) do
       1 | []
       2 | [:redbull, Money.new(0)]
@@ -63,7 +63,7 @@ describe VendingMachine do
     end
   end
 
-  context 'when the push some bottuns' do
+  context 'when push some bottuns' do
     where(:name, :dispensed) do
       :cola       | [:cola, Money.new(0)]
       :oolong_tea | [:oolong_tea, Money.new(0)]
@@ -87,7 +87,7 @@ describe VendingMachine do
     end
 
     with_them do
-      it 'dispenses a cola if payment is enough' do
+      it 'lights up purshasable-item bottuns' do
         number_of_insertion.times { vm.insert(Currency.new(100)) }
         expect(vm.show).to eq display
       end
@@ -101,7 +101,7 @@ describe VendingMachine do
     end
 
     with_them do
-      it 'lights down after refunding' do
+      it 'lights down all bottuns after refunding' do
         vm.insert(Currency.new(100))
         vm.refund if refund?
         expect(vm.show).to eq display
@@ -149,8 +149,8 @@ describe VendingMachine do
       end
     end
 
-    context 'when a item selected' do
-      it 'withdraw and dispenses a item' do
+    context 'when a item is selected' do
+      it 'withdraws and dispenses a item' do
         fc_mock = double('Feica Client')
         allow(fc_mock).to receive(:withdraw).and_return(true)
         expect(fc_mock).to receive(:withdraw)
